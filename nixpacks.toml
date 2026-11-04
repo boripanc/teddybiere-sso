@@ -1,0 +1,10 @@
+# Build settings for Coolify's Nixpacks build pack.
+# Dev dependencies (TypeScript) are needed to build, even when NODE_ENV=production.
+[phases.install]
+cmds = ["npm ci --include=dev"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npm start"
