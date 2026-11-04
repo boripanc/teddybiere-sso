@@ -23,25 +23,37 @@ Planned: 2FA (authenticator apps / passkeys), SAML for apps that only speak SAML
 ```sh
 npm install
 # needs Postgres at postgres://postgres@localhost:5432/sso (override with DATABASE_URL)
-npm run dev
+npm run dev          # or: npm run build && npm start
 ```
 
 Discovery document: http://localhost:3000/.well-known/openid-configuration
 
-## Deploy on a VPS
+## Deploy with Coolify
 
-1. Point a DNS record (e.g. `sso.example.com`) at the VPS.
-2. `cp .env.example .env` and fill it in (`openssl rand -base64 32` for the secrets).
-3. `docker compose up -d --build`
+Coolify builds the app straight from this repo with Nixpacks. You don't need a Dockerfile.
 
-Caddy handles HTTPS certificates automatically.
+1. **Database:** in your Coolify project, choose *New → Database → PostgreSQL*, start it, and copy its **Postgres URL (internal)**.
+2. **App:** choose *New → Public/Private Repository*, pick this repo and the `main` branch, and set the build pack to **Nixpacks**.
+3. **Port and domain:** set *Ports Exposes* to `3000` and *Domains* to e.g. `https://sso.example.com`. Coolify handles HTTPS.
+4. **Environment variables:**
+   - `ISSUER` = the same `https://` domain
+   - `DATABASE_URL` = the internal Postgres URL from step 1
+   - `COOKIE_KEYS` = output of `openssl rand -base64 32`
+   - `NODE_ENV` = `production`
+5. **Health check (optional):** path `/healthz`.
+6. Deploy. The tables are created on first start.
+
+Then open the app's **Terminal** in Coolify and create your first admin:
+
+```sh
+npm run cli -- create-user you@example.com "Your Name" --admin
+```
 
 ## Add users and apps
 
-The easiest way is the admin page at `https://<your-domain>/admin`. Create the first admin with the CLI:
+The easiest way is the admin page at `https://<your-domain>/admin`. The CLI does the same (`npm run cli:dev -- ...` when developing locally):
 
 ```sh
-# locally: npm run cli -- ...   on the VPS: docker compose exec sso npx tsx src/cli.ts ...
 npm run cli -- create-user you@example.com "Your Name" --admin
 npm run cli -- create-client "Grafana" https://grafana.example.com/login/generic_oauth
 npm run cli -- create-client "My SPA" https://app.example.com/callback --public

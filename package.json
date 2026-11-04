@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "start": "tsx src/server.ts",
-    "cli": "tsx src/cli.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "cli": "node dist/cli.js",
+    "cli:dev": "tsx src/cli.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -23,5 +25,8 @@
     "@types/pg": "^8.23.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
