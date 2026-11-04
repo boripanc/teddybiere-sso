@@ -1,4 +1,5 @@
 import express, { type NextFunction, type Request, type Response } from 'express';
+import { adminRouter } from './admin.js';
 import { config } from './config.js';
 import { cleanupExpired, migrate } from './db.js';
 import { createProvider } from './provider.js';
@@ -35,6 +36,7 @@ async function clientName(clientId: unknown) {
 }
 
 app.get('/healthz', (_req, res) => res.send('ok'));
+app.use('/admin', adminRouter());
 
 app.get('/interaction/:uid', pageHeaders, wrap(async (req, res) => {
   const { uid, prompt, params } = await provider.interactionDetails(req, res);

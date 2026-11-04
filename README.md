@@ -13,9 +13,10 @@ library) with TypeScript, Express and Postgres.
 - Single sign-on: once signed in, other apps sign you in without asking again (14 day session)
 - Sign out (`/session/end`)
 - Signing keys generated on first start and stored in Postgres; published at `/jwks`
+- Admin page at `/admin`: add/remove users, reset passwords, make admins, register apps, edit redirect URLs, rotate app secrets
 - CLI to add users and register apps
 
-Planned: web admin page, 2FA (authenticator apps / passkeys), SAML for apps that only speak SAML.
+Planned: 2FA (authenticator apps / passkeys), SAML for apps that only speak SAML.
 
 ## Run locally
 
@@ -36,6 +37,8 @@ Discovery document: http://localhost:3000/.well-known/openid-configuration
 Caddy handles HTTPS certificates automatically.
 
 ## Add users and apps
+
+The easiest way is the admin page at `https://<your-domain>/admin`. Create the first admin with the CLI:
 
 ```sh
 # locally: npm run cli -- ...   on the VPS: docker compose exec sso npx tsx src/cli.ts ...

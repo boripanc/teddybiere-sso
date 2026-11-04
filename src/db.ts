@@ -41,6 +41,14 @@ export async function migrate(): Promise<void> {
     CREATE INDEX IF NOT EXISTS oidc_payloads_user_code ON oidc_payloads (user_code);
     CREATE INDEX IF NOT EXISTS oidc_payloads_expires_at ON oidc_payloads (expires_at);
 
+    -- Sign-ins to the admin page. Only a hash of the cookie token is stored.
+    CREATE TABLE IF NOT EXISTS admin_sessions (
+      token_hash text PRIMARY KEY,
+      user_id    uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      csrf       text NOT NULL,
+      expires_at timestamptz NOT NULL
+    );
+
     -- Token signing keys (private JWKs). Newest key signs; all are published for verification.
     CREATE TABLE IF NOT EXISTS signing_keys (
       id         serial PRIMARY KEY,
@@ -53,4 +61,5 @@ export async function migrate(): Promise<void> {
 // Remove expired sessions/tokens. Run periodically.
 export async function cleanupExpired(): Promise<void> {
   await pool.query(`DELETE FROM oidc_payloads WHERE expires_at IS NOT NULL AND expires_at < now()`);
+  await pool.query(`DELETE FROM admin_sessions WHERE expires_at < now()`);
 }
